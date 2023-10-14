@@ -1,4 +1,4 @@
-package io.xks.fabricmod.matrixbuddy.decision;
+package io.xks.fabricmod.matrixbuddy.decision.tasking;
 
 import java.util.function.Consumer;
 

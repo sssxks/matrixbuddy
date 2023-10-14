@@ -1,4 +1,4 @@
-package io.xks.fabricmod.matrixbuddy.decision;
+package io.xks.fabricmod.matrixbuddy.decision.tasking;
 
 import java.util.function.Consumer;
 
@@ -7,13 +7,13 @@ import java.util.function.Consumer;
  * It's not truly asynchronous as all tasks run on the same thread.
  */
 public abstract class TimeSlicedTask implements Task {
-    enum Status {
+    public enum Status {
         NOT_STARTED,
         RUNNING,
         COMPLETED
     }
-    Status status;
-    Consumer<? super TimeSlicedTask> callback;
+    public Status status;
+    public Consumer<? super TimeSlicedTask> callback;
 
     /**
      * Constructs a new cooperative task.

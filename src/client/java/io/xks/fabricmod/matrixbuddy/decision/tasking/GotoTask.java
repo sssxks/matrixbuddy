@@ -1,4 +1,4 @@
-package io.xks.fabricmod.matrixbuddy.decision;
+package io.xks.fabricmod.matrixbuddy.decision.tasking;
 
 import baritone.api.pathing.goals.GoalXZ;
 import baritone.api.process.ICustomGoalProcess;

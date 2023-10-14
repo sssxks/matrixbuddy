@@ -1,18 +1,15 @@
 package io.xks.fabricmod.matrixbuddy.player;
 
+import io.xks.fabricmod.matrixbuddy.decision.storage.Vault;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.SlotActionType;
 
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 public class Backpack implements Inventory {
-    enum BackpackSlot {
+    public enum BackpackSlot {
         CRAFT_OUTPUT(0),
         CRAFT_INPUT_1(1),
         CRAFT_INPUT_2(2),
@@ -65,7 +62,7 @@ public class Backpack implements Inventory {
             this.id = id;
         }
 
-        public static BackpackSlot fromId(int id){
+        public static BackpackSlot fromId(int id){//TODO: look up in a map, reduce complexity
             for (BackpackSlot slot : BackpackSlot.values()) {
                 if (slot.id == id){
                     return slot;
@@ -77,47 +74,32 @@ public class Backpack implements Inventory {
     }
 
     PlayerInventory inventory;
-    Map<Item, Map.Entry<Integer, LinkedList<BackpackSlot>>> vault;
+    Vault vault;
     public Backpack(PlayerInventory inventory){
         this.inventory = inventory;
-
-        for (int i = BackpackSlot.INVENTORY_1.id; i <= BackpackSlot.INVENTORY_36.id ; i++) {
-            ItemStack stack = inventory.getStack(i);
-
-            // update the vault count and slot id list.
-            Map.Entry<Integer, LinkedList<BackpackSlot>> oldValue = vault.getOrDefault(stack.getItem(), new AbstractMap.SimpleEntry<>(0, new LinkedList<>()));
-            int newCount = oldValue.getKey() + stack.getCount();
-            oldValue.getValue().add(BackpackSlot.fromId(i)); //TODO: unnecessary O(n^2) time complexity
-            vault.put(stack.getItem(), new AbstractMap.SimpleEntry<>(newCount, oldValue.getValue()));
-        }
+        this.vault = new Vault(inventory);
     }
 
-    public boolean contains(Item item, int count){
-        return (vault.containsKey(item) ? vault.get(item).getKey() : 0 )>= count;
+
+    private void pickupItem(BackpackSlot slot, int quantity){
+        int stackQuantity = inventory.getStack(slot.id).getCount();
+
+        if (quantity == stackQuantity){
+            clickSlot(slot, SlotActionType.PICKUP, 0);
+        } else {
+            clickSlot(slot, SlotActionType.PICKUP, 0);
+            for (int i = 0; i < quantity - stackQuantity; i++) {
+                clickSlot(slot, SlotActionType.PICKUP, 1);
+            }
+        }
     }
 
     /**
-     * this method is used to test whether the backpack contains adequate amount of items specified in the item parameter. call it before crafting something.
-     * @param items 2d array containing items, most of the time the recipe.
-     * @param batchSize multiplier for the quantity for each item.
-     * @return whether backpack contains the items specified.
+     * underlying method that clicks the slot.
+     * @param slot slot
+     * @param actionType actionType
+     * @param button button. 0 for left-click, 1 for right-click. I don't know the rest.
      */
-    public boolean contains(Item[][] items, int batchSize){
-        Map<Item, Integer> ingredientQuantity = new HashMap<>();
-        for (Item[] row : items) {
-            for (Item item : row) {
-                ingredientQuantity.put(item, ingredientQuantity.getOrDefault(item, 0) + 1);
-            }
-        }
-
-        for (Map.Entry<Item, Integer> entry : ingredientQuantity.entrySet()) {
-            if (!contains(entry.getKey(), entry.getValue() * batchSize)){
-                return false;
-            }
-        }
-        return true;
-    }
-
     private void clickSlot(BackpackSlot slot, SlotActionType actionType, int button){
         MinecraftClient client = MinecraftClient.getInstance();
 
@@ -126,22 +108,28 @@ public class Backpack implements Inventory {
         assert client.interactionManager != null;
         client.interactionManager.clickSlot(syncId, slot.id, button, actionType, client.player);
     }
+
     public void craft(Item[][] recipe, int batchSize){
-        if (!contains(recipe, batchSize)) {
+        if (!vault.contains(recipe, batchSize)) {
             throw new IllegalStateException("you don't have the adequate amount of items!");
         }
 
 
         for (int rowIndex = 0; rowIndex < recipe.length; rowIndex++) {
             for (int colIndex = 0; colIndex < recipe[rowIndex].length; colIndex++) {
-                int recipePosition = rowIndex + colIndex;
+                int recipePosition = rowIndex + colIndex + 1;
+                Item item = recipe[rowIndex][colIndex];
 
-                BackpackSlot slot = vault.get(recipe[rowIndex][colIndex]).getValue().pop();
+                List<Map.Entry<Vault.ItemLocationDescriptor, Integer>> locations = vault.locateItem(item, batchSize);
 
+                for (Map.Entry<Vault.ItemLocationDescriptor, Integer> location : locations) {
+                    //when the item doesn't match what we have thought, throw an error
+                    assert location.getKey().quantity == inventory.getStack(location.getKey().slot.id).getCount();
+                    pickupItem(location.getKey().slot, location.getValue());
+                }
 
-                clickSlot(slot, SlotActionType.PICKUP, 0);
                 for (int i = 0; i < batchSize; i++) {
-                    clickSlot(BackpackSlot.valueOf("CRAFT_" + recipePosition), SlotActionType.PICKUP, 1);
+                    clickSlot(BackpackSlot.valueOf("CRAFT_INPUT_" + recipePosition), SlotActionType.PICKUP, 1);
                 }
             }
         }
