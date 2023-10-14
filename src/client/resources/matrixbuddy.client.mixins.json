@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "io.xks.fabricmod.matrixbuddy.mixin.client",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "MixinClient",
+    "MixinTitleScreen"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+	}
+}
