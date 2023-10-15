@@ -1,5 +1,6 @@
 package io.xks.fabricmod.matrixbuddy.player;
 
+import io.xks.fabricmod.matrixbuddy.decision.storage.Recipe;
 import io.xks.fabricmod.matrixbuddy.decision.storage.Vault;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
@@ -62,7 +63,8 @@ public class Backpack implements Inventory {
             this.id = id;
         }
 
-        public static BackpackSlot fromId(int id){//TODO: look up in a map, reduce complexity
+        public static BackpackSlot fromId(int id){
+            //TODO: look up in a map, reduce complexity
             for (BackpackSlot slot : BackpackSlot.values()) {
                 if (slot.id == id){
                     return slot;
@@ -100,7 +102,7 @@ public class Backpack implements Inventory {
      * @param actionType actionType
      * @param button button. 0 for left-click, 1 for right-click. I don't know the rest.
      */
-    private void clickSlot(BackpackSlot slot, SlotActionType actionType, int button){
+    public void clickSlot(BackpackSlot slot, SlotActionType actionType, int button){
         MinecraftClient client = MinecraftClient.getInstance();
 
         assert client.player != null;
@@ -109,28 +111,71 @@ public class Backpack implements Inventory {
         client.interactionManager.clickSlot(syncId, slot.id, button, actionType, client.player);
     }
 
-    public void craft(Item[][] recipe, int batchSize){
-        if (!vault.contains(recipe, batchSize)) {
+    public void craft(Recipe recipe, int quantity){
+        Map<Item, Integer> ingredientsWithQuantities = recipe.getIngredientsWithQuantities();
+        if (!vault.contains(ingredientsWithQuantities, quantity)) {
             throw new IllegalStateException("you don't have the adequate amount of items!");
         }
 
+        //split the quantity into batches. a batchSize refers to the quantity of input items.
+        int fullStacks = quantity % 64;
+        int remainingItems = quantity / 64;
+        int[] batches = new int[fullStacks + remainingItems == 0 ? 0 :1];
+        for (int i = 0; i < fullStacks; i++) {
+            batches[i] = 64;
+        }
+        if (remainingItems != 0){
+            batches[fullStacks] = remainingItems;
+        }
 
-        for (int rowIndex = 0; rowIndex < recipe.length; rowIndex++) {
-            for (int colIndex = 0; colIndex < recipe[rowIndex].length; colIndex++) {
+        //figuring out where each ingredient is located.
+        Map<Item, List<Map.Entry<Vault.ItemLocationDescriptor, Integer>>> ingredientLocations = new HashMap<>(4);
+        ingredientsWithQuantities.forEach((ingredient, ingredientQuantity) -> {
+            ingredientLocations.put(ingredient, vault.retrieve(ingredient, quantity));
+        });
+
+        //craft in batches.
+        for (int batchSize : batches) {
+            craftSingleBatch(recipe, batchSize, ingredientLocations);
+        }
+    }
+
+    /**
+     * This method is for crafting a single batch of items. The reason why we crafting in batches is that the quantity of input stacks can only be at most 64. you should use craft() most of the time for convenience.
+     *
+     * @param recipe              the recipe
+     * @param quantity            int between 1 and 64
+     * @param locations this will be seen as a temporary object, will be modified after executing this method.
+     */
+    public void craftSingleBatch(Recipe recipe, int quantity, Map<Item, List<Map.Entry<Vault.ItemLocationDescriptor, Integer>>> locations){
+        if (quantity > 64 || quantity < 1){
+            throw new IllegalArgumentException("the quantity of input stacks can only be at most 64 per batch");
+        }
+
+        //for each slot in the crafting table
+        for (int rowIndex = 0; rowIndex < recipe.inputs.length; rowIndex++) {
+            for (int colIndex = 0; colIndex < recipe.inputs.length; colIndex++) {
                 int recipePosition = rowIndex + colIndex + 1;
-                Item item = recipe[rowIndex][colIndex];
+                Item item = recipe.inputs[rowIndex][colIndex];
 
-                List<Map.Entry<Vault.ItemLocationDescriptor, Integer>> locations = vault.locateItem(item, batchSize);
-
-                for (Map.Entry<Vault.ItemLocationDescriptor, Integer> location : locations) {
+                int remaining = quantity;
+                // pick up item from each location and put them in the crafting table
+                for (Map.Entry<Vault.ItemLocationDescriptor, Integer> locationAndCount : locations.get(item)) {
                     //when the item doesn't match what we have thought, throw an error
-                    assert location.getKey().quantity == inventory.getStack(location.getKey().slot.id).getCount();
-                    pickupItem(location.getKey().slot, location.getValue());
+                    assert locationAndCount.getKey().quantity == inventory.getStack(locationAndCount.getKey().slot.id).getCount();
+
+                    pickupItem(locationAndCount.getKey().slot, locationAndCount.getValue());
+                    clickSlot(BackpackSlot.valueOf("CRAFT_INPUT_" + recipePosition), SlotActionType.PICKUP, 1);
+
+                    remaining -= locationAndCount.getKey().quantity;
+                    if (remaining == 0){
+                        break;
+                    }
+
+                    vault.update(inventory);
                 }
 
-                for (int i = 0; i < batchSize; i++) {
-                    clickSlot(BackpackSlot.valueOf("CRAFT_INPUT_" + recipePosition), SlotActionType.PICKUP, 1);
-                }
+
             }
         }
     }

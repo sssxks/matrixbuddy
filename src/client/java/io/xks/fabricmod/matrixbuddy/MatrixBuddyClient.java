@@ -4,6 +4,7 @@ import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
 import io.xks.fabricmod.matrixbuddy.decision.tasking.BeatMinecraftTask;
 import io.xks.fabricmod.matrixbuddy.decision.tasking.PeriodicTaskRunner;
+import io.xks.fabricmod.matrixbuddy.decision.tasking.TestCraftTask;
 import io.xks.fabricmod.matrixbuddy.eventbus.EventBus;
 import io.xks.fabricmod.matrixbuddy.eventbus.EventListener;
 import io.xks.fabricmod.matrixbuddy.eventbus.events.*;
@@ -57,7 +58,7 @@ public class MatrixBuddyClient implements ClientModInitializer {
 
 		EventBus.subscribe(DecisionTickEvent.class, event -> PeriodicTaskRunner.tick());
 
-		EventBus.subscribe(DecisionStartEvent.class, event -> new BeatMinecraftTask(task -> {}).run());
+		EventBus.subscribe(DecisionStartEvent.class, event -> new TestCraftTask().run());
 
 	}
 

@@ -9,7 +9,7 @@ import java.util.*;
 
 /**
  * helps manage the inventory of a player, chest, enderchest and so on. Unite multiple physical storage device.
- * this is more like a imagination of items storage from the bot's perspective.
+ * this is more like a imagination of items storage from the bot's perspective, so it doesn't update itself to avoid hallucination and out of sync. Update via update().
  */
 public class Vault {
 
@@ -27,7 +27,7 @@ public class Vault {
      * update the vault based on a player inventory.
      * @param inventory PlayerInventory
      */
-    private void update(PlayerInventory inventory) {
+    public void update(PlayerInventory inventory) {
         for (int i = Backpack.BackpackSlot.INVENTORY_1.id; i <= Backpack.BackpackSlot.INVENTORY_36.id ; i++) {
             ItemStack stack = inventory.getStack(i);
 
@@ -39,17 +39,53 @@ public class Vault {
 
             Entry entry = content.get(item);
             entry.quantity += stack.getCount();
-            entry.locations.add(new ItemLocationDescriptor(Backpack.BackpackSlot.fromId(i), stack.getCount()));
+
+            ItemLocationDescriptor locationDescriptor = new ItemLocationDescriptor();
+            locationDescriptor.setProperty("type", "inventory");
+            locationDescriptor.setProperty("slot", Backpack.BackpackSlot.fromId(i));
+            locationDescriptor.setProperty("quantity", stack.getCount());
+            entry.locations.add(locationDescriptor);
         }
     }
 
     /**
      * describes the location of an item. can be inventory, enderchest, chest...
      * shulker boxes will be viewed as an extension for the types above.
+     * <p>
+     * {
+     *     "type": "inventory",
+     *     "quantity": int,
+     *     "slot": Backpack.BackpackSlot
+     * }
+     * <p>
+     * {
+     *     "type": "enderchest",
+     *     "quantity": int,
+     *     "slot": ??EnderChestSlot
+     * }
+     * <p>
+     * {
+     *     "type": "chest",
+     *     "quantity": int,
+     *     "location": ????(x,y),
+     *     "isLarge": boolean,
+     *     "slot": ????
+     * }
      */
     public class ItemLocationDescriptor {
-        public Backpack.BackpackSlot slot;
-        public int quantity;
+        private Map<String, Object> properties;
+
+        public ItemLocationDescriptor() {
+            this.properties = new HashMap<>(5);
+        }
+
+        public Object getProperty(String key) {
+            return properties.get(key);
+        }
+
+        public void setProperty(String key, Object value) {
+            properties.put(key, value);
+        }
 
         public ItemLocationDescriptor(Backpack.BackpackSlot slot, int quantity) {
             this.slot = slot;
@@ -73,20 +109,13 @@ public class Vault {
     }
 
     /**
-     * this method is used to test whether the backpack contains adequate amount of items specified in the item parameter. call it before crafting something.
-     * @param items 2d array containing items, most of the time the recipe.
+     * this method is used to test whether the backpack contains adequate amount of items specified in the items parameter. call it before crafting something.
+     * @param items items, most of the time the recipe.
      * @param batchSize multiplier for the quantity for each item.
      * @return whether backpack contains the items specified.
      */
-    public boolean contains(Item[][] items, int batchSize){
-        Map<Item, Integer> ingredientQuantity = new HashMap<>();
-        for (Item[] row : items) {
-            for (Item item : row) {
-                ingredientQuantity.put(item, ingredientQuantity.getOrDefault(item, 0) + 1);
-            }
-        }
-
-        for (Map.Entry<Item, Integer> entry : ingredientQuantity.entrySet()) {
+    public boolean contains(Map<Item, Integer> items, int batchSize){
+        for (Map.Entry<Item, Integer> entry : items.entrySet()) {
             if (!contains(entry.getKey(), entry.getValue() * batchSize)){
                 return false;
             }
@@ -95,12 +124,12 @@ public class Vault {
     }
 
     /**
-     * find available locations of the given item. prefer nearer containers (inventory, enderchest, chest...)
+     * find available locations of the given item. prefer nearer containers (inventory, enderchest, chest...). no actual update on the internal Mao. call update() after you have finished work with the inventory.
      * @param item item
      * @param quantity quantity
-     * @return null if cannot find the required amount.
+     * @return the locations of the item
      */
-    public List<Map.Entry<ItemLocationDescriptor,Integer>> locateItem(Item item, int quantity) {
+    public List<Map.Entry<ItemLocationDescriptor,Integer>> retrieve(Item item, int quantity) {
         List<Map.Entry<ItemLocationDescriptor,Integer>> result = new ArrayList<>();
         Entry entry = content.get(item);
 
