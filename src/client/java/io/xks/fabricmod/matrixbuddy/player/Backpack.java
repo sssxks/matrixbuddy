@@ -130,9 +130,7 @@ public class Backpack implements Inventory {
 
         //figuring out where each ingredient is located.
         Map<Item, List<Map.Entry<Vault.ItemLocationDescriptor, Integer>>> ingredientLocations = new HashMap<>(4);
-        ingredientsWithQuantities.forEach((ingredient, ingredientQuantity) -> {
-            ingredientLocations.put(ingredient, vault.retrieve(ingredient, quantity));
-        });
+        ingredientsWithQuantities.forEach((ingredient, ingredientQuantity) -> ingredientLocations.put(ingredient, vault.retrieve(ingredient, quantity)));
 
         //craft in batches.
         for (int batchSize : batches) {
@@ -161,13 +159,19 @@ public class Backpack implements Inventory {
                 int remaining = quantity;
                 // pick up item from each location and put them in the crafting table
                 for (Map.Entry<Vault.ItemLocationDescriptor, Integer> locationAndCount : locations.get(item)) {
-                    //when the item doesn't match what we have thought, throw an error
-                    assert locationAndCount.getKey().quantity == inventory.getStack(locationAndCount.getKey().slot.id).getCount();
+                    //only wants the items in inventory
+                    if (locationAndCount.getKey().device != Vault.ItemLocationDescriptor.Device.INVENTORY){
+                        continue;
+                    }
 
-                    pickupItem(locationAndCount.getKey().slot, locationAndCount.getValue());
+                    Vault.InventoryDescriptor locationDescriptor = ((Vault.InventoryDescriptor) locationAndCount.getKey());
+                    //when the item doesn't match what we have thought, throw an error
+                    assert locationDescriptor.quantity == inventory.getStack(locationDescriptor.slot.id).getCount();
+
+                    pickupItem(locationDescriptor.slot, locationAndCount.getValue());
                     clickSlot(BackpackSlot.valueOf("CRAFT_INPUT_" + recipePosition), SlotActionType.PICKUP, 1);
 
-                    remaining -= locationAndCount.getKey().quantity;
+                    remaining -= locationDescriptor.quantity;
                     if (remaining == 0){
                         break;
                     }

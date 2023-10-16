@@ -9,7 +9,7 @@ import java.util.*;
 
 /**
  * helps manage the inventory of a player, chest, enderchest and so on. Unite multiple physical storage device.
- * this is more like a imagination of items storage from the bot's perspective, so it doesn't update itself to avoid hallucination and out of sync. Update via update().
+ * this is more like an imagination of items storage from the bot's perspective, so it doesn't update itself to avoid hallucination and out of sync. Update via update().
  */
 public class Vault {
 
@@ -24,26 +24,37 @@ public class Vault {
     }
 
     /**
-     * update the vault based on a player inventory.
+     * Update the vault based on a player inventory.
      * @param inventory PlayerInventory
      */
     public void update(PlayerInventory inventory) {
+        //TODO: Considering reading from PlayerInventoru real-time. But other devices still need manual update.
+
+        //clear inventory items off the vault.
+        content.forEach((item, entry) -> {
+            Iterator<ItemLocationDescriptor> iterator = entry.locations.iterator();
+            while (iterator.hasNext()) {
+                ItemLocationDescriptor location = iterator.next();
+                if (location.device == ItemLocationDescriptor.Device.INVENTORY) {
+                    iterator.remove();
+                }
+            }
+        });
+
+
         for (int i = Backpack.BackpackSlot.INVENTORY_1.id; i <= Backpack.BackpackSlot.INVENTORY_36.id ; i++) {
             ItemStack stack = inventory.getStack(i);
 
             // update the vault.
             Item item = stack.getItem();
             if (!content.containsKey(item)){
-                content.put(item, new Entry(new ArrayList<>(), 0));
+                content.put(item, new Entry(new LinkedList<>(), 0));
             }
 
             Entry entry = content.get(item);
             entry.quantity += stack.getCount();
 
-            ItemLocationDescriptor locationDescriptor = new ItemLocationDescriptor();
-            locationDescriptor.setProperty("type", "inventory");
-            locationDescriptor.setProperty("slot", Backpack.BackpackSlot.fromId(i));
-            locationDescriptor.setProperty("quantity", stack.getCount());
+            InventoryDescriptor locationDescriptor = new InventoryDescriptor(stack.getCount(), Backpack.BackpackSlot.fromId(i));
             entry.locations.add(locationDescriptor);
         }
     }
@@ -51,53 +62,55 @@ public class Vault {
     /**
      * describes the location of an item. can be inventory, enderchest, chest...
      * shulker boxes will be viewed as an extension for the types above.
-     * <p>
-     * {
-     *     "type": "inventory",
-     *     "quantity": int,
-     *     "slot": Backpack.BackpackSlot
-     * }
-     * <p>
-     * {
-     *     "type": "enderchest",
-     *     "quantity": int,
-     *     "slot": ??EnderChestSlot
-     * }
-     * <p>
-     * {
-     *     "type": "chest",
-     *     "quantity": int,
-     *     "location": ????(x,y),
-     *     "isLarge": boolean,
-     *     "slot": ????
-     * }
      */
     public class ItemLocationDescriptor {
-        private Map<String, Object> properties;
-
-        public ItemLocationDescriptor() {
-            this.properties = new HashMap<>(5);
+        public enum Device{
+            INVENTORY,
+            ENDERCHEST,
+            CHEST
         }
 
-        public Object getProperty(String key) {
-            return properties.get(key);
-        }
-
-        public void setProperty(String key, Object value) {
-            properties.put(key, value);
-        }
-
-        public ItemLocationDescriptor(Backpack.BackpackSlot slot, int quantity) {
-            this.slot = slot;
+        public final Device device;
+        public final int quantity;
+        public boolean isShulker;
+//        int ShulkerSlot; // the slot in the shulker box
+        public ItemLocationDescriptor(Device device, int quantity){
+            this.device = device;
             this.quantity = quantity;
         }
     }
 
+    public class InventoryDescriptor extends ItemLocationDescriptor{
+        public final Backpack.BackpackSlot slot;
+
+        public InventoryDescriptor(int quantity, Backpack.BackpackSlot slot) {
+            super(Device.INVENTORY, quantity);
+            this.slot = slot;
+        }
+    }
+
+    public class EnderChestDescriptor extends ItemLocationDescriptor{
+//        int slot
+
+        public EnderChestDescriptor(int quantity) {
+            super(Device.ENDERCHEST, quantity);
+        }
+    }
+
+    public class ChestDescriptor extends ItemLocationDescriptor{
+        public ChestDescriptor(int quantity) {
+            super(Device.CHEST, quantity);
+        }
+//        location
+//        isLarge
+//        slot
+    }
+
     class Entry {
-        List<ItemLocationDescriptor> locations;
+        final LinkedList<ItemLocationDescriptor> locations;
         int quantity;
 
-        public Entry(List<ItemLocationDescriptor> locations, int quantity) {
+        public Entry(LinkedList<ItemLocationDescriptor> locations, int quantity) {
             this.locations = locations;
             this.quantity = quantity;
         }

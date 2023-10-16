@@ -2,7 +2,6 @@ package io.xks.fabricmod.matrixbuddy;
 
 import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
-import io.xks.fabricmod.matrixbuddy.decision.tasking.BeatMinecraftTask;
 import io.xks.fabricmod.matrixbuddy.decision.tasking.PeriodicTaskRunner;
 import io.xks.fabricmod.matrixbuddy.decision.tasking.TestCraftTask;
 import io.xks.fabricmod.matrixbuddy.eventbus.EventBus;

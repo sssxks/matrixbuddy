@@ -5,7 +5,7 @@ import net.minecraft.client.MinecraftClient;
 public class ClientTickEvent implements Event{
 
 
-    private MinecraftClient client;
+    private final MinecraftClient client;
     public ClientTickEvent(MinecraftClient client){
         this.client = client;
     }

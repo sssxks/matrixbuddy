@@ -4,15 +4,11 @@ import io.xks.fabricmod.matrixbuddy.eventbus.EventBus;
 import io.xks.fabricmod.matrixbuddy.eventbus.events.TitleScreenEntryEvent;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.text.Text;
-import net.minecraft.world.level.storage.LevelStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.List;
 
 @Mixin(TitleScreen.class)
 public abstract class MixinTitleScreen extends Screen {

@@ -6,8 +6,8 @@ import net.minecraft.client.MinecraftClient;
 
 public class Craft2by2Task implements Task{
 
-    Recipe recipe;
-    int batchSize;
+    final Recipe recipe;
+    final int batchSize;
     public Craft2by2Task(Recipe recipe, int batchSize){
         this.recipe = recipe;
         this.batchSize = batchSize;

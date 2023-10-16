@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Recipe{
-    public Item[][] inputs;
+    public final Item[][] inputs;
 
     public Recipe(Item[][] inputs) {
         this.inputs = inputs;

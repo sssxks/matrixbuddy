@@ -13,7 +13,7 @@ public abstract class TimeSlicedTask implements Task {
         COMPLETED
     }
     public Status status;
-    public Consumer<? super TimeSlicedTask> callback;
+    public final Consumer<? super TimeSlicedTask> callback;
 
     /**
      * Constructs a new cooperative task.

@@ -1,15 +1,8 @@
 package io.xks.fabricmod.matrixbuddy.mixin.client;
 
-import baritone.api.BaritoneAPI;
-import baritone.api.IBaritone;
-import baritone.api.pathing.goals.GoalXZ;
-import baritone.api.process.ICustomGoalProcess;
-import baritone.api.process.IMineProcess;
-import baritone.api.utils.BetterBlockPos;
 import io.xks.fabricmod.matrixbuddy.eventbus.EventBus;
 import io.xks.fabricmod.matrixbuddy.eventbus.events.ClientTickEvent;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;

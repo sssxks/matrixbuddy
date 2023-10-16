@@ -7,9 +7,9 @@ import java.util.LinkedList;
  * A runner for periodic cooperative tasks. It should be ticked at regular intervals to update the tasks' status.
  */
 public class PeriodicTaskRunner {
-    static LinkedList<PeriodicTimeSlicedTask> tasks = new LinkedList<>();
-    static LinkedList<PeriodicTimeSlicedTask> tasksToAdd = new LinkedList<>();
-    static LinkedList<PeriodicTimeSlicedTask> tasksToRemove = new LinkedList<>();
+    static final LinkedList<PeriodicTimeSlicedTask> tasks = new LinkedList<>();
+    static final LinkedList<PeriodicTimeSlicedTask> tasksToAdd = new LinkedList<>();
+    static final LinkedList<PeriodicTimeSlicedTask> tasksToRemove = new LinkedList<>();
 
     /**
      * Adds a task to the runner.
