@@ -55,24 +55,38 @@ public class Backpack implements Inventory {
         INVENTORY_33(41),
         INVENTORY_34(42),
         INVENTORY_35(43),
-        INVENTORY_36(44);
+        INVENTORY_36(44),
+
+        OFFHAND(45);
+
 
         public final int id;
-
         BackpackSlot(int id) {
             this.id = id;
         }
 
-        public static BackpackSlot fromId(int id){
-            //TODO: look up in a map, reduce complexity
-            for (BackpackSlot slot : BackpackSlot.values()) {
-                if (slot.id == id){
-                    return slot;
-                }
+        public static BackpackSlot fromClickSlotId(int id){
+            if (id > 44 || id < 0){
+                throw new IllegalArgumentException("No enum constant BackPackSlot with id " + id);
             }
-            throw new IllegalArgumentException("No enum constant BackPackSlot with id " + id);
 
+            return BackpackSlot.values()[id];
         }
+
+        public static BackpackSlot fromPlayerInventoryId(int id){
+            if (0<= id && id <= 8) { // hotbar
+                return BackpackSlot.values()[id + 36];
+            } else if (9 <= id && id <= 35) { //inv
+                return  BackpackSlot.values()[(id - 9) + 9];
+            } else if (36 <= id && id <= 39) { //armor
+                return BackpackSlot.values()[8 - (id - 36)];
+            } else if (id == 40) {//offhand
+                return OFFHAND;
+            } else {
+                throw new IllegalArgumentException("id should be within the range [0, 40]!");
+            }
+        }
+
     }
 
     PlayerInventory inventory;
@@ -113,7 +127,15 @@ public class Backpack implements Inventory {
 
     public void craft(Recipe recipe, int quantity){
         Map<Item, Integer> ingredientsWithQuantities = recipe.getIngredientsWithQuantities();
-        if (!vault.contains(ingredientsWithQuantities, quantity)) {
+
+        // multiply the map by quantity.
+        Iterator<Map.Entry<Item, Integer>> iterator = ingredientsWithQuantities.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Item, Integer> entry = iterator.next();
+            entry.setValue(entry.getValue() * quantity);
+        }
+
+        if (!vault.contains(ingredientsWithQuantities)) {
             throw new IllegalStateException("you don't have the adequate amount of items!");
         }
 

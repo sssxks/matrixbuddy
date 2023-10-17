@@ -16,6 +16,11 @@ public class Recipe{
         Map<Item, Integer> ingredientQuantity = new HashMap<>(9);
         for (Item[] row : inputs) {
             for (Item item : row) {
+                //skip null items
+                if (item == null) {
+                    continue;
+                }
+
                 ingredientQuantity.put(item, ingredientQuantity.getOrDefault(item, 0) + 1);
             }
         }

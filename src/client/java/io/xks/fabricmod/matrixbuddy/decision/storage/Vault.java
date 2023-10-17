@@ -8,7 +8,7 @@ import net.minecraft.item.ItemStack;
 import java.util.*;
 
 /**
- * helps manage the inventory of a player, chest, enderchest and so on. Unite multiple physical storage device.
+ * helps manage the inventory of a player, chest, enderchest and so on. Combine multiple physical storage device.
  * this is more like an imagination of items storage from the bot's perspective, so it doesn't update itself to avoid hallucination and out of sync. Update via update().
  */
 public class Vault {
@@ -41,8 +41,8 @@ public class Vault {
             }
         });
 
-
-        for (int i = Backpack.BackpackSlot.INVENTORY_1.id; i <= Backpack.BackpackSlot.INVENTORY_36.id ; i++) {
+        //iterate over the inventory 36+4(armor)+1(offhand) slots.
+        for (int i = 0; i <= 35 ; i++) {
             ItemStack stack = inventory.getStack(i);
 
             // update the vault.
@@ -54,7 +54,7 @@ public class Vault {
             Entry entry = content.get(item);
             entry.quantity += stack.getCount();
 
-            InventoryDescriptor locationDescriptor = new InventoryDescriptor(stack.getCount(), Backpack.BackpackSlot.fromId(i));
+            InventoryDescriptor locationDescriptor = new InventoryDescriptor(stack.getCount(), Backpack.BackpackSlot.fromPlayerInventoryId(i));
             entry.locations.add(locationDescriptor);
         }
     }
@@ -124,12 +124,11 @@ public class Vault {
     /**
      * this method is used to test whether the backpack contains adequate amount of items specified in the items parameter. call it before crafting something.
      * @param items items, most of the time the recipe.
-     * @param batchSize multiplier for the quantity for each item.
      * @return whether backpack contains the items specified.
      */
-    public boolean contains(Map<Item, Integer> items, int batchSize){
+    public boolean contains(Map<Item, Integer> items){
         for (Map.Entry<Item, Integer> entry : items.entrySet()) {
-            if (!contains(entry.getKey(), entry.getValue() * batchSize)){
+            if (!contains(entry.getKey(), entry.getValue())){
                 return false;
             }
         }
