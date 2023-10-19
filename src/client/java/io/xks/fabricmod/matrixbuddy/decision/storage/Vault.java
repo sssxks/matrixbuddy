@@ -28,7 +28,7 @@ public class Vault {
      * @param inventory PlayerInventory
      */
     public void update(PlayerInventory inventory) {
-        //TODO: Considering reading from PlayerInventoru real-time. But other devices still need manual update.
+        //TODO: Considering reading from PlayerInventory real-time. But other devices still need manual update.
 
         //clear inventory items off the vault.
         content.forEach((item, entry) -> {
@@ -150,8 +150,9 @@ public class Vault {
         }
 
         for (ItemLocationDescriptor location : entry.locations) {
-            int amountToTake = Math.max(location.quantity, quantity);
+            int amountToTake = Math.min(location.quantity, quantity);
             result.add(new AbstractMap.SimpleEntry<>(location, amountToTake));
+            quantity -= amountToTake;
             if (quantity == 0){
                 break;
             }

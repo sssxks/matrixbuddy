@@ -23,7 +23,6 @@ public abstract class MixinClient {
     )
     private void clientTick(CallbackInfo ci) {
         EventBus.publish(new ClientTickEvent(getInstance()));
-
     }
 
 //    @Inject(method = "setWorld",at = @At("RETURN"))
