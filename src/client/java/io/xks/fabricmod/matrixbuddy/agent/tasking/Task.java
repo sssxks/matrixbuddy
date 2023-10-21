@@ -1,4 +1,4 @@
-package io.xks.fabricmod.matrixbuddy.decision.tasking;
+package io.xks.fabricmod.matrixbuddy.agent.tasking;
 
 /**
  * An interface for tasks.

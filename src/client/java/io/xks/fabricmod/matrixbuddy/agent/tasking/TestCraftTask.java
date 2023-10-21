@@ -1,6 +1,6 @@
-package io.xks.fabricmod.matrixbuddy.decision.tasking;
+package io.xks.fabricmod.matrixbuddy.agent.tasking;
 
-import io.xks.fabricmod.matrixbuddy.decision.storage.Recipe;
+import io.xks.fabricmod.matrixbuddy.agent.storage.Recipe;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;

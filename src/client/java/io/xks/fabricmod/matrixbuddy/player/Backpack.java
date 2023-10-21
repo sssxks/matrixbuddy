@@ -1,7 +1,7 @@
 package io.xks.fabricmod.matrixbuddy.player;
 
-import io.xks.fabricmod.matrixbuddy.decision.storage.Recipe;
-import io.xks.fabricmod.matrixbuddy.decision.storage.Vault;
+import io.xks.fabricmod.matrixbuddy.agent.storage.Recipe;
+import io.xks.fabricmod.matrixbuddy.agent.storage.Vault;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
@@ -195,7 +195,7 @@ public class Backpack implements Inventory {
                     assert locationDescriptor.quantity == inventory.getStack(locationDescriptor.slot.playerInventoryId).getCount();
 
                     pickupItem(locationDescriptor.slot, locationAndCount.getValue());
-                    clickSlot(BackpackSlot.valueOf("CRAFT_INPUT_" + recipePosition), SlotActionType.PICKUP, 1);
+                    clickSlot(BackpackSlot.valueOf("CRAFT_INPUT_" + recipePosition), SlotActionType.PICKUP, 0);
 
                     remaining -= locationAndCount.getValue();
                     if (remaining == 0){

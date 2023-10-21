@@ -2,8 +2,8 @@ package io.xks.fabricmod.matrixbuddy;
 
 import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
-import io.xks.fabricmod.matrixbuddy.decision.tasking.EmptyTestTask;
-import io.xks.fabricmod.matrixbuddy.decision.tasking.PeriodicTaskRunner;
+import io.xks.fabricmod.matrixbuddy.agent.tasking.PeriodicTaskRunner;
+import io.xks.fabricmod.matrixbuddy.agent.tasking.TestCraftTask;
 import io.xks.fabricmod.matrixbuddy.eventbus.EventBus;
 import io.xks.fabricmod.matrixbuddy.eventbus.EventListener;
 import io.xks.fabricmod.matrixbuddy.eventbus.events.*;
@@ -12,7 +12,7 @@ import net.minecraft.client.MinecraftClient;
 
 
 /**
- * this class is responsible for initializing the mod. It maintains the stage of whether the game has entered the title screen for the first time.
+ * this class is responsible for initializing the mod. It keeps track of the stage of whether the game has entered the title screen for the first time.
  */
 public class MatrixBuddyClient implements ClientModInitializer {
 	private int decisionCDPeriod;
@@ -34,13 +34,14 @@ public class MatrixBuddyClient implements ClientModInitializer {
 		if (hasEnteredTitleScreen){
 			return;
 		}
-
+		hasEnteredTitleScreen = true;
 //		EventBus.unsubscribe(TitleScreenEntryEvent.class, this::init);
 		instance = this;
 		this.baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
 
 		EventBus.subscribe(ClientTickEvent.class, new EventListener() {
 			private boolean firstFire = true;
+			long startTime = 0;
 			@Override
 			public void onEvent(Event event) {
 				MinecraftClient client = ((ClientTickEvent)event).client();
@@ -48,6 +49,12 @@ public class MatrixBuddyClient implements ClientModInitializer {
 					decisionCDPeriod++;
 					if (decisionCDPeriod % 30 == 0){
 						decisionCDPeriod = 0;
+
+						//calculate the MSP30T
+						long endTime = System.nanoTime();
+						double elapsedMilliseconds = (double) (startTime - endTime) / 1_000_000.0;
+						System.out.println( "MS/30tick "+ elapsedMilliseconds); //TODO: remove this
+						startTime = endTime;
 
 						if (firstFire) {
 							EventBus.publish(new DecisionStartEvent());
@@ -66,8 +73,8 @@ public class MatrixBuddyClient implements ClientModInitializer {
 
 		EventBus.subscribe(DecisionTickEvent.class, event -> PeriodicTaskRunner.tick());
 
-//		EventBus.subscribe(DecisionStartEvent.class, event -> new TestCraftTask().run());
-		EventBus.subscribe(DecisionStartEvent.class, event -> new EmptyTestTask().run());
+		EventBus.subscribe(DecisionStartEvent.class, event -> new TestCraftTask().run());
+//		EventBus.subscribe(DecisionStartEvent.class, event -> new EmptyTestTask().run());
 
 
 	}

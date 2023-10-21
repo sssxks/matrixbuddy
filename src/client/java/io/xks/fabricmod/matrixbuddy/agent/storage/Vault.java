@@ -1,4 +1,4 @@
-package io.xks.fabricmod.matrixbuddy.decision.storage;
+package io.xks.fabricmod.matrixbuddy.agent.storage;
 
 import io.xks.fabricmod.matrixbuddy.player.Backpack;
 import net.minecraft.entity.player.PlayerInventory;

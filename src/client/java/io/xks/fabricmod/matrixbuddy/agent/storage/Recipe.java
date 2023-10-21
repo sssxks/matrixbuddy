@@ -1,4 +1,4 @@
-package io.xks.fabricmod.matrixbuddy.decision.storage;
+package io.xks.fabricmod.matrixbuddy.agent.storage;
 
 import net.minecraft.item.Item;
 

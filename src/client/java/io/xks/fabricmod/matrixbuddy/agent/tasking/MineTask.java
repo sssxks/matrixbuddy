@@ -1,4 +1,4 @@
-package io.xks.fabricmod.matrixbuddy.decision.tasking;
+package io.xks.fabricmod.matrixbuddy.agent.tasking;
 
 import baritone.api.process.IMineProcess;
 import io.xks.fabricmod.matrixbuddy.MatrixBuddyClient;

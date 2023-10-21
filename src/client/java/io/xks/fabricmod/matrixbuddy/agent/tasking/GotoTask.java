@@ -1,4 +1,4 @@
-package io.xks.fabricmod.matrixbuddy.decision.tasking;
+package io.xks.fabricmod.matrixbuddy.agent.tasking;
 
 import baritone.api.pathing.goals.GoalXZ;
 import baritone.api.process.ICustomGoalProcess;
@@ -8,6 +8,9 @@ import net.minecraft.util.math.BlockPos;
 
 import java.util.function.Consumer;
 
+/**
+ * as if type in the baritone goto command. //TODO:more goal types.
+ */
 public class GotoTask extends PeriodicTimeSlicedTask {
     private int x;
     private int z;
@@ -17,7 +20,7 @@ public class GotoTask extends PeriodicTimeSlicedTask {
      *
      * @param callback a callback to be invoked when the task completes
      */
-    public GotoTask(Consumer<TimeSlicedTask> callback) {
+    public GotoTask(int x, int y, Consumer<TimeSlicedTask> callback) {
         super(callback);
     }
 
