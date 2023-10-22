@@ -176,7 +176,7 @@ public class Backpack implements Inventory {
         //STEP1: put in ingredients. for each slot in the crafting table
         for (int rowIndex = 0; rowIndex < recipe.inputs.length; rowIndex++) {
             for (int colIndex = 0; colIndex < recipe.inputs.length; colIndex++) {
-                int recipePosition = rowIndex + colIndex + 1;
+                int recipePosition = rowIndex*2 + colIndex + 1;
                 Item item = recipe.inputs[rowIndex][colIndex];
                 if (item == null) {
                     continue;

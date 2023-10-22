@@ -15,11 +15,12 @@ import net.minecraft.client.MinecraftClient;
  * this class is responsible for initializing the mod. It keeps track of the stage of whether the game has entered the title screen for the first time.
  */
 public class MatrixBuddyClient implements ClientModInitializer {
-	private int decisionCDPeriod;
+	private int decisionCooldown;
 	public static MatrixBuddyClient instance;
 	private static boolean hasEnteredTitleScreen = false;
 
 	public IBaritone baritone;
+	private final int decisionPeriodTicks = 10;
 
 
 	@Override
@@ -41,20 +42,20 @@ public class MatrixBuddyClient implements ClientModInitializer {
 
 		EventBus.subscribe(ClientTickEvent.class, new EventListener() {
 			private boolean firstFire = true;
-			long startTime = 0;
+//			long startTime = 0;
 			@Override
 			public void onEvent(Event event) {
 				MinecraftClient client = ((ClientTickEvent)event).client();
 				if (isInGame(client))  {
-					decisionCDPeriod++;
-					if (decisionCDPeriod % 30 == 0){
-						decisionCDPeriod = 0;
+					decisionCooldown++;
+					if (decisionCooldown % decisionPeriodTicks == 0){
+						decisionCooldown = 0;
 
 						//calculate the MSP30T
-						long endTime = System.nanoTime();
-						double elapsedMilliseconds = (double) (startTime - endTime) / 1_000_000.0;
-						System.out.println( "MS/30tick "+ elapsedMilliseconds); //TODO: remove this
-						startTime = endTime;
+//						long endTime = System.nanoTime();
+//						double elapsedMilliseconds = (double) (startTime - endTime) / 1_000_000.0;
+//						System.out.println( "MS/30tick "+ elapsedMilliseconds);
+//						startTime = endTime;
 
 						if (firstFire) {
 							EventBus.publish(new DecisionStartEvent());

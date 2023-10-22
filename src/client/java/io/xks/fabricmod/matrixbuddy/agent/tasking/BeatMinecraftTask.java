@@ -1,5 +1,13 @@
 package io.xks.fabricmod.matrixbuddy.agent.tasking;
 
+import io.xks.fabricmod.matrixbuddy.agent.collect.MineTask;
+import io.xks.fabricmod.matrixbuddy.agent.storage.Recipe;
+import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
+
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class BeatMinecraftTask extends TimeSlicedTask{
@@ -24,8 +32,18 @@ public class BeatMinecraftTask extends TimeSlicedTask{
         new MineTask(16,this::afterCollectingDirt, "minecraft:dirt").run();
     }
 
-    private void afterCollectingDirt(TimeSlicedTask task) {
-//        new Craft2by2Task
-        complete();
+    public void afterCollectingDirt(TimeSlicedTask task) {
+        Recipe planksRecipe = new Recipe(new Item[][]{{Registries.ITEM.get(new Identifier("minecraft", "oak_log")).asItem(), null}, {null, null}});
+
+        Item planks = Registries.ITEM.get(new Identifier("minecraft", "oak_planks")).asItem();
+        Recipe workbenchRecipe = new Recipe(new Item[][]{{planks, planks}, {planks, planks}});
+
+        new Craft2by2Task(planksRecipe, 1);
+        new CraftPipelineTask(new LinkedList<>(List.of(new Craft2by2Task(planksRecipe, 1), new Craft2by2Task(workbenchRecipe, 1))), this::afterCraftingCraftingTable).run();
     }
+
+    public void afterCraftingCraftingTable(TimeSlicedTask task){
+
+    }
+
 }
