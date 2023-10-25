@@ -1,8 +1,12 @@
-package io.xks.fabricmod.matrixbuddy.agent.tasking;
+package io.xks.fabricmod.matrixbuddy.agent.movement;
 
 import baritone.api.pathing.goals.GoalXZ;
 import baritone.api.process.ICustomGoalProcess;
 import io.xks.fabricmod.matrixbuddy.MatrixBuddyClient;
+import io.xks.fabricmod.matrixbuddy.agent.tasking.Task;
+import io.xks.fabricmod.matrixbuddy.eventbus.EventBus;
+import io.xks.fabricmod.matrixbuddy.eventbus.events.DecisionTickEvent;
+import io.xks.fabricmod.matrixbuddy.eventbus.events.Event;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 
@@ -11,7 +15,7 @@ import java.util.function.Consumer;
 /**
  * as if type in the baritone goto command. //TODO:more goal types.
  */
-public class GotoTask extends PeriodicTimeSlicedTask {
+public class GotoTask extends Task {
     private int x;
     private int z;
 
@@ -20,7 +24,7 @@ public class GotoTask extends PeriodicTimeSlicedTask {
      *
      * @param callback a callback to be invoked when the task completes
      */
-    public GotoTask(int x, int y, Consumer<TimeSlicedTask> callback) {
+    public GotoTask(int x, int y, Consumer<Task> callback) {
         super(callback);
     }
 
@@ -30,15 +34,24 @@ public class GotoTask extends PeriodicTimeSlicedTask {
         ICustomGoalProcess customGoalProcess = MatrixBuddyClient.instance.baritone.getCustomGoalProcess();
         GoalXZ walkingGoal = new GoalXZ(x,z);
         customGoalProcess.setGoalAndPath(walkingGoal);
+
+        EventBus.subscribe(DecisionTickEvent.class, this::tick);
     }
 
-    @Override
-    public void tick() {
+    public void tick(Event event) {
         assert MinecraftClient.getInstance().player != null;
-        BlockPos pos = MinecraftClient.getInstance().player.getBlockPos();
-        if (pos.getX() == x && pos.getZ() == z){
+        //TODO: test needed.
+//        if (!MatrixBuddyClient.instance.baritone.getPathingBehavior().isPathing()) {
+//            complete();
+//        }
+        if (!MatrixBuddyClient.instance.baritone.getCustomGoalProcess().isActive()) {
             complete();
         }
+
+//        BlockPos pos = MinecraftClient.getInstance().player.getBlockPos();
+//        if (pos.getX() == x && pos.getZ() == z){
+//            complete();
+//        }
 
     }
 }

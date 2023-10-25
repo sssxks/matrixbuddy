@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.screen.slot.SlotActionType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -98,7 +99,7 @@ public class Backpack implements Inventory {
     }
 
 
-    private void pickupItem(BackpackSlot slot, int quantity){
+    private void pickupItem(@NotNull BackpackSlot slot, int quantity){
         int stackQuantity = inventory.getStack(slot.playerInventoryId).getCount();
 
         if (quantity == stackQuantity){
@@ -117,7 +118,7 @@ public class Backpack implements Inventory {
      * @param actionType actionType
      * @param button button. 0 for left-click, 1 for right-click. I don't know the rest.
      */
-    public void clickSlot(BackpackSlot slot, SlotActionType actionType, int button){
+    public void clickSlot(@NotNull BackpackSlot slot, SlotActionType actionType, int button){
         MinecraftClient client = MinecraftClient.getInstance();
 
         assert client.player != null;
@@ -126,7 +127,7 @@ public class Backpack implements Inventory {
         client.interactionManager.clickSlot(syncId, slot.clickSlotId, button, actionType, client.player);
     }
 
-    public void craft(Recipe recipe, int quantity){
+    public void craft(@NotNull Recipe recipe, int quantity){
         Map<Item, Integer> ingredientsWithQuantities = recipe.getIngredientsWithQuantities();
 
         // multiply the map by quantity.

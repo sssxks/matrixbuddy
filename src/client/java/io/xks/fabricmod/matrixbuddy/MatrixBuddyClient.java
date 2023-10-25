@@ -2,8 +2,7 @@ package io.xks.fabricmod.matrixbuddy;
 
 import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
-import io.xks.fabricmod.matrixbuddy.agent.tasking.PeriodicTaskRunner;
-import io.xks.fabricmod.matrixbuddy.agent.tasking.TestCraftTask;
+import io.xks.fabricmod.matrixbuddy.agent.Agent;
 import io.xks.fabricmod.matrixbuddy.eventbus.EventBus;
 import io.xks.fabricmod.matrixbuddy.eventbus.EventListener;
 import io.xks.fabricmod.matrixbuddy.eventbus.events.*;
@@ -17,25 +16,23 @@ import net.minecraft.client.MinecraftClient;
 public class MatrixBuddyClient implements ClientModInitializer {
 	private int decisionCooldown;
 	public static MatrixBuddyClient instance;
-	private static boolean hasEnteredTitleScreen = false;
+	private static boolean hasInitialized = false;
 
 	public IBaritone baritone;
 	private final int decisionPeriodTicks = 10;
+	private Agent agent;
 
 
 	@Override
 	public void onInitializeClient() {
-		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
-		//this.client = MinecraftClient.getInstance();
-
 		EventBus.subscribe(TitleScreenEntryEvent.class, this::init);
 	}
 
 	private void init(Event _unused){
-		if (hasEnteredTitleScreen){
+		if (hasInitialized){
 			return;
 		}
-		hasEnteredTitleScreen = true;
+		hasInitialized = true;
 //		EventBus.unsubscribe(TitleScreenEntryEvent.class, this::init);
 		instance = this;
 		this.baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
@@ -66,16 +63,13 @@ public class MatrixBuddyClient implements ClientModInitializer {
 
 					}
 
-				} /*else {
+				} else {
 					firstFire = true;
-				}*/
+				}
 			}
 		} );
 
-		EventBus.subscribe(DecisionTickEvent.class, event -> PeriodicTaskRunner.tick());
-
-		EventBus.subscribe(DecisionStartEvent.class, event -> new TestCraftTask().run());
-//		EventBus.subscribe(DecisionStartEvent.class, event -> new EmptyTestTask().run());
+		EventBus.subscribe(DecisionStartEvent.class, event -> agent = new Agent());
 
 
 	}

@@ -1,18 +1,19 @@
-package io.xks.fabricmod.matrixbuddy.agent.tasking;
+package io.xks.fabricmod.matrixbuddy.agent.crafting;
 
 import io.xks.fabricmod.matrixbuddy.agent.storage.Recipe;
 import io.xks.fabricmod.matrixbuddy.player.Backpack;
 import net.minecraft.client.MinecraftClient;
 
-public class Craft2by2Task implements Task{
+public class Craft2by2Task implements Runnable {
 
-    final Recipe recipe;
-    final int batchSize;
-    public Craft2by2Task(Recipe recipe, int batchSize){
+    private final Recipe recipe;
+    private final int batchSize;
+
+    public Craft2by2Task(Recipe recipe, int batchSize) {
         this.recipe = recipe;
         this.batchSize = batchSize;
     }
-    @Override
+
     public void run() {
         MinecraftClient client = MinecraftClient.getInstance();
         assert client.player != null;
