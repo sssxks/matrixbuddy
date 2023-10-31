@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class Backpack implements Inventory {
-    public enum BackpackSlot {
+public class InventoryController implements Inventory {
+    public enum InventorySlot {
         CRAFT_OUTPUT(0, -1),//TODO: refactor this later
         CRAFT_INPUT_1(1, -1),
         CRAFT_INPUT_2(2, -1),
@@ -62,26 +62,26 @@ public class Backpack implements Inventory {
 
         public final int clickSlotId;
         public final int playerInventoryId;
-        BackpackSlot(int clickSlotId, int playerInventoryId) {
+        InventorySlot(int clickSlotId, int playerInventoryId) {
             this.clickSlotId = clickSlotId;
             this.playerInventoryId = playerInventoryId;
         }
 
-        public static BackpackSlot fromClickSlotId(int id){
+        public static InventorySlot fromClickSlotId(int id){
             if (id > 44 || id < 0){
                 throw new IllegalArgumentException("No enum constant BackPackSlot with clickSlotId " + id);
             }
 
-            return BackpackSlot.values()[id];
+            return InventorySlot.values()[id];
         }
 
-        public static BackpackSlot fromPlayerInventoryId(int id){
+        public static InventorySlot fromPlayerInventoryId(int id){
             if (0<= id && id <= 8) { // hot-bar
-                return BackpackSlot.values()[id + 36];
+                return InventorySlot.values()[id + 36];
             } else if (9 <= id && id <= 35) { //inv
-                return  BackpackSlot.values()[(id - 9) + 9];
+                return  InventorySlot.values()[(id - 9) + 9];
             } else if (36 <= id && id <= 39) { //armor
-                return BackpackSlot.values()[8 - (id - 36)];
+                return InventorySlot.values()[8 - (id - 36)];
             } else if (id == 40) {//offhand
                 return OFFHAND;
             } else {
@@ -93,13 +93,13 @@ public class Backpack implements Inventory {
 
     PlayerInventory inventory;
     Vault vault;
-    public Backpack(PlayerInventory inventory){
+    public InventoryController(PlayerInventory inventory){
         this.inventory = inventory;
         this.vault = new Vault(inventory);
     }
 
 
-    private void pickupItem(@NotNull BackpackSlot slot, int quantity){
+    private void pickupItem(@NotNull InventoryController.InventorySlot slot, int quantity){
         int stackQuantity = inventory.getStack(slot.playerInventoryId).getCount();
 
         if (quantity == stackQuantity){
@@ -118,7 +118,7 @@ public class Backpack implements Inventory {
      * @param actionType actionType
      * @param button button. 0 for left-click, 1 for right-click. I don't know the rest.
      */
-    public void clickSlot(@NotNull BackpackSlot slot, SlotActionType actionType, int button){
+    public void clickSlot(@NotNull InventoryController.InventorySlot slot, SlotActionType actionType, int button){
         MinecraftClient client = MinecraftClient.getInstance();
 
         assert client.player != null;
@@ -196,7 +196,7 @@ public class Backpack implements Inventory {
                     assert locationDescriptor.quantity == inventory.getStack(locationDescriptor.slot.playerInventoryId).getCount();
 
                     pickupItem(locationDescriptor.slot, locationAndCount.getValue());
-                    clickSlot(BackpackSlot.valueOf("CRAFT_INPUT_" + recipePosition), SlotActionType.PICKUP, 0);
+                    clickSlot(InventorySlot.valueOf("CRAFT_INPUT_" + recipePosition), SlotActionType.PICKUP, 0);
 
                     remaining -= locationAndCount.getValue();
                     if (remaining == 0){
@@ -209,7 +209,7 @@ public class Backpack implements Inventory {
         }
 
         //STEP2: take out the product
-        clickSlot(BackpackSlot.CRAFT_OUTPUT, SlotActionType.QUICK_MOVE, 0);
+        clickSlot(InventorySlot.CRAFT_OUTPUT, SlotActionType.QUICK_MOVE, 0);
         vault.update(inventory);
     }
 }

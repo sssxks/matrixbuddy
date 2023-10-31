@@ -36,7 +36,7 @@ public abstract class Task {
         status = Status.PENDING;
     }
 
-    public void proceed(){
+    public void resume(){
         status = Status.RUNNING;
     }
 

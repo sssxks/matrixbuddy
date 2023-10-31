@@ -1,6 +1,6 @@
 package io.xks.fabricmod.matrixbuddy.agent.storage;
 
-import io.xks.fabricmod.matrixbuddy.player.Backpack;
+import io.xks.fabricmod.matrixbuddy.player.InventoryController;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -54,7 +54,7 @@ public class Vault {
             Entry entry = content.get(item);
             entry.quantity += stack.getCount();
 
-            InventoryDescriptor locationDescriptor = new InventoryDescriptor(stack.getCount(), Backpack.BackpackSlot.fromPlayerInventoryId(i));
+            InventoryDescriptor locationDescriptor = new InventoryDescriptor(stack.getCount(), InventoryController.InventorySlot.fromPlayerInventoryId(i));
             entry.locations.add(locationDescriptor);
         }
     }
@@ -81,9 +81,9 @@ public class Vault {
     }
 
     public class InventoryDescriptor extends ItemLocationDescriptor{
-        public final Backpack.BackpackSlot slot;
+        public final InventoryController.InventorySlot slot;
 
-        public InventoryDescriptor(int quantity, Backpack.BackpackSlot slot) {
+        public InventoryDescriptor(int quantity, InventoryController.InventorySlot slot) {
             super(Device.INVENTORY, quantity);
             this.slot = slot;
         }

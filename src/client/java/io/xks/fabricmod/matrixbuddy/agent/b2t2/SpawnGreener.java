@@ -31,8 +31,8 @@ public class SpawnGreener extends Task {
     }
 
     @Override
-    public void proceed() {
-        super.proceed();
+    public void resume() {
+        super.resume();
     }
 
     @Override

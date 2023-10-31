@@ -41,8 +41,8 @@ public class MineTask extends Task {
     }
 
     @Override
-    public void proceed() {
-        super.proceed();
+    public void resume() {
+        super.resume();
     }
 
 

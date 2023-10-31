@@ -1,7 +1,7 @@
 package io.xks.fabricmod.matrixbuddy.agent.crafting;
 
 import io.xks.fabricmod.matrixbuddy.agent.storage.Recipe;
-import io.xks.fabricmod.matrixbuddy.player.Backpack;
+import io.xks.fabricmod.matrixbuddy.player.InventoryController;
 import net.minecraft.client.MinecraftClient;
 
 public class Craft2by2Task implements Runnable {
@@ -17,9 +17,9 @@ public class Craft2by2Task implements Runnable {
     public void run() {
         MinecraftClient client = MinecraftClient.getInstance();
         assert client.player != null;
-        Backpack backpack = new Backpack(client.player.getInventory());
+        InventoryController inventoryController = new InventoryController(client.player.getInventory());
 
-        backpack.craft(recipe, batchSize);
+        inventoryController.craft(recipe, batchSize);
     }
 
 }
