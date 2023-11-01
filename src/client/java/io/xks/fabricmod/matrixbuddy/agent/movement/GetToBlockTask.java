@@ -1,7 +1,9 @@
 package io.xks.fabricmod.matrixbuddy.agent.movement;
 
+import baritone.api.pathing.goals.GoalBlock;
 import baritone.api.pathing.goals.GoalXZ;
 import baritone.api.process.ICustomGoalProcess;
+import baritone.api.process.IGetToBlockProcess;
 import io.xks.fabricmod.matrixbuddy.MatrixBuddyClient;
 import io.xks.fabricmod.matrixbuddy.agent.tasking.Task;
 import io.xks.fabricmod.matrixbuddy.eventbus.EventBus;
@@ -12,30 +14,46 @@ import net.minecraft.util.math.BlockPos;
 
 import java.util.function.Consumer;
 
-/**
- * as if type in the baritone goto command. //TODO:more goal types.
- */
-public class GotoTask extends Task {
-    private int x;
-    private int z;
+public class GetToBlockTask extends Task {
+    BlockPos pos;
 
     /**
-     * Constructs a new periodic cooperative task.
+     * Constructs a new cooperative task.
      *
      * @param callback a callback to be invoked when the task completes
      */
-    public GotoTask(int x, int y, Consumer<Task> callback) {
+    public GetToBlockTask(BlockPos pos, Consumer<Task> callback) {
         super(callback);
+        this.pos = pos;
     }
 
     @Override
     public void run() {
         super.run();
         ICustomGoalProcess customGoalProcess = MatrixBuddyClient.instance.baritone.getCustomGoalProcess();
-        GoalXZ walkingGoal = new GoalXZ(x,z);
+
+        GoalBlock walkingGoal = new GoalBlock(pos);
         customGoalProcess.setGoalAndPath(walkingGoal);
 
         EventBus.subscribe(DecisionTickEvent.class, this::tick);
+
+    }
+
+    @Override
+    public void interrupt() {
+        super.interrupt();
+        MatrixBuddyClient.instance.baritone.getPathingBehavior().cancelEverything();
+    }
+
+    @Override
+    public void resume() {
+        super.resume();
+        run();
+    }
+
+    @Override
+    public void complete() {
+        super.complete();
     }
 
     public void tick(Event event) {
@@ -55,22 +73,4 @@ public class GotoTask extends Task {
 
     }
 
-    @Override
-    public void interrupt() {
-        super.interrupt();
-        MatrixBuddyClient.instance.baritone.getPathingBehavior().cancelEverything();
-
-    }
-
-    @Override
-    public void resume() {
-        super.resume();
-        run();
-
-    }
-
-    @Override
-    public void complete() {
-        super.complete();
-    }
 }
