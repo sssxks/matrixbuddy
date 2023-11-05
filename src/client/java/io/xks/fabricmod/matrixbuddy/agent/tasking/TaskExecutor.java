@@ -1,25 +1,53 @@
 package io.xks.fabricmod.matrixbuddy.agent.tasking;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.PriorityQueue;
+import java.util.function.Consumer;
 
 public class TaskExecutor {
 
-    private static class PrioritizedTask{
-        Task task;
+    /**
+     * wrapper class used in the task executor.
+     */
+    private static class PrioritizedTask extends Task{
+        @Override
+        public void run() {
+            task.run();
+        }
+
+        @Override
+        public void interrupt() {
+            task.interrupt();
+        }
+
+        @Override
+        public void resume() {
+            task.resume();
+        }
+
+        @Override
+        public void complete() {
+            task.complete();
+        }
+
+        private final Task task;
 
         public int getPriority() {
             return priority;
         }
 
-        int priority;
+        private final int priority;
 
-        public PrioritizedTask(Task task, int priority) {
+        public PrioritizedTask (Task task, int priority, Consumer<Task> callback) {
+            super(null);
             this.task = task;
             this.priority = priority;
+            Consumer<? super Task> originalCallback = task.callback;
+            task.callback = (Consumer<Task>) task1 -> {
+                originalCallback.accept(task1);
+                callback.accept(this);
+            };
         }
     }
     PriorityQueue<PrioritizedTask> queue;
@@ -29,12 +57,17 @@ public class TaskExecutor {
     }
 
     public void add(Task task, int priority){
-        if (!queue.isEmpty() && priority > queue.peek().priority) {
-            queue.peek().task.interrupt();
+        PrioritizedTask previous = queue.peek();
+        queue.add(new PrioritizedTask(task, priority, this::onTaskComplete));
+
+        if (previous != null && priority > previous.priority) {
+            previous.interrupt();
+            Objects.requireNonNull(queue.peek()).run();
         }
 
-        queue.add(new PrioritizedTask(task, priority));
-        queue.peek().task.run();
+        if (previous == null){
+            Objects.requireNonNull(queue.peek()).run();
+        }
     }
 
 //    public void remove(Task task){
@@ -46,7 +79,7 @@ public class TaskExecutor {
         queue.poll();
 
         if (!queue.isEmpty()){
-            queue.peek().task.run();
+            queue.peek().run();
         }
     }
 }

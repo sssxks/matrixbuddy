@@ -15,7 +15,7 @@ public abstract class Task {
         COMPLETED
     }
     public Status status;
-    public final Consumer<? super Task> callback;
+    public Consumer<? super Task> callback;
 
     /**
      * Constructs a new cooperative task.

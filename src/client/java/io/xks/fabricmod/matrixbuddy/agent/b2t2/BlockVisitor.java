@@ -1,13 +1,9 @@
 package io.xks.fabricmod.matrixbuddy.agent.b2t2;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 public class BlockVisitor {
     public LinkedList<BlockPos> breadthFirstSearch(BlockView startBlock, Map<BlockPos, Boolean> visited){
@@ -22,8 +18,9 @@ public class BlockVisitor {
             visited.put(block.getPos(), true);
 
             for (BlockView neighbor : block.getAdjacent()) {
-                if (!visited.getOrDefault(neighbor.getPos(), false)
-                && neighbor.getBlock() == Blocks.OBSIDIAN){
+                if (neighbor.getBlock() == Blocks.OBSIDIAN
+                        && !visited.getOrDefault(neighbor.getPos(), false)
+                        && !queue.contains(neighbor)){
                     queue.add(neighbor);
                 }
             }

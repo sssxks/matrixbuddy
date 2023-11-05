@@ -1,24 +1,20 @@
 package io.xks.fabricmod.matrixbuddy.agent.b2t2;
 
-import baritone.Baritone;
-import baritone.cache.CachedChunk;
 import baritone.cache.WorldScanner;
-import com.sun.source.tree.WhileLoopTree;
 import io.xks.fabricmod.matrixbuddy.MatrixBuddyClient;
-import io.xks.fabricmod.matrixbuddy.agent.collect.MineTask;
 import io.xks.fabricmod.matrixbuddy.agent.movement.GetToBlockTask;
 import io.xks.fabricmod.matrixbuddy.agent.tasking.Task;
+import io.xks.fabricmod.matrixbuddy.agent.tasking.TaskExecutor;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class ObsidianCleanTask extends Task {
-    LinkedList<GetToBlockTask> tasks;
+
+    private final TaskExecutor taskExecutor;
 
     /**
      * Constructs a new cooperative task.
@@ -27,7 +23,7 @@ public class ObsidianCleanTask extends Task {
      */
     public ObsidianCleanTask(Consumer<Task> callback) {
         super(callback);
-        tasks = new LinkedList<>();
+        this.taskExecutor = new TaskExecutor();
     }
 
     @Override
@@ -38,7 +34,15 @@ public class ObsidianCleanTask extends Task {
 //            if (status = Status.PENDING) {
 //TODO: task Stack? task state store & resume.
 //            }
-            result.forEach(groups -> groups.forEach(blockPos -> new GetToBlockTask(blockPos, task -> {})));
+            result.forEach(group -> {
+                if (group.size() >= 50){
+                    return;
+                }
+                
+                group.forEach(blockPos -> {
+                    taskExecutor.add(new GetToBlockTask(blockPos, task -> {}), 1);
+                });
+            });
 
 
         }).exceptionally(ex -> {

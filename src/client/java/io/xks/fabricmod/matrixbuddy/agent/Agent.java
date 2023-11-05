@@ -1,7 +1,7 @@
 package io.xks.fabricmod.matrixbuddy.agent;
 
+import io.xks.fabricmod.matrixbuddy.agent.b2t2.ObsidianCleanTask;
 import io.xks.fabricmod.matrixbuddy.agent.command.Commander;
-import io.xks.fabricmod.matrixbuddy.agent.tasking.Task;
 import io.xks.fabricmod.matrixbuddy.agent.tasking.TaskExecutor;
 
 /**
@@ -17,6 +17,7 @@ public class Agent {
     public Agent() {
         this.commander = new Commander();
         this.taskExecutor = new TaskExecutor();
+        taskExecutor.add(new ObsidianCleanTask(task -> {}), 1);
     }
 
 //    public onPlayerDamage()

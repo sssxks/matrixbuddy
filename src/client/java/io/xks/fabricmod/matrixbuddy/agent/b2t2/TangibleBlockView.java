@@ -4,7 +4,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,5 +40,18 @@ public class TangibleBlockView implements BlockView{
         adjacentBlocks.add(new TangibleBlockView(pos.add(0,1,0)));
 
         return adjacentBlocks;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TangibleBlockView that = (TangibleBlockView) o;
+        return Objects.equals(pos, that.pos) && Objects.equals(block, that.block);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pos);
     }
 }

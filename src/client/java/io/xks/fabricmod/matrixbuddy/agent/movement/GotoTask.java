@@ -8,7 +8,6 @@ import io.xks.fabricmod.matrixbuddy.eventbus.EventBus;
 import io.xks.fabricmod.matrixbuddy.eventbus.events.DecisionTickEvent;
 import io.xks.fabricmod.matrixbuddy.eventbus.events.Event;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
 
 import java.util.function.Consumer;
 
@@ -72,5 +71,6 @@ public class GotoTask extends Task {
     @Override
     public void complete() {
         super.complete();
+        EventBus.unsubscribe(DecisionTickEvent.class, this::tick);
     }
 }

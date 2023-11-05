@@ -1,9 +1,7 @@
 package io.xks.fabricmod.matrixbuddy.agent.movement;
 
 import baritone.api.pathing.goals.GoalBlock;
-import baritone.api.pathing.goals.GoalXZ;
 import baritone.api.process.ICustomGoalProcess;
-import baritone.api.process.IGetToBlockProcess;
 import io.xks.fabricmod.matrixbuddy.MatrixBuddyClient;
 import io.xks.fabricmod.matrixbuddy.agent.tasking.Task;
 import io.xks.fabricmod.matrixbuddy.eventbus.EventBus;
@@ -16,6 +14,7 @@ import java.util.function.Consumer;
 
 public class GetToBlockTask extends Task {
     BlockPos pos;
+
 
     /**
      * Constructs a new cooperative task.
@@ -54,6 +53,8 @@ public class GetToBlockTask extends Task {
     @Override
     public void complete() {
         super.complete();
+        EventBus.unsubscribe(DecisionTickEvent.class, this::tick);
+
     }
 
     public void tick(Event event) {
