@@ -1,8 +1,10 @@
 package io.xks.fabricmod.matrixbuddy.agent.b2t2;
 
+import baritone.api.pathing.goals.GoalBlock;
+import baritone.api.pathing.goals.GoalComposite;
 import baritone.cache.WorldScanner;
 import io.xks.fabricmod.matrixbuddy.MatrixBuddyClient;
-import io.xks.fabricmod.matrixbuddy.agent.movement.GetToBlockTask;
+import io.xks.fabricmod.matrixbuddy.agent.movement.CustomGoalTask;
 import io.xks.fabricmod.matrixbuddy.agent.tasking.Task;
 import io.xks.fabricmod.matrixbuddy.agent.tasking.TaskExecutor;
 import net.minecraft.block.Blocks;
@@ -35,13 +37,18 @@ public class ObsidianCleanTask extends Task {
 //TODO: task Stack? task state store & resume.
 //            }
             result.forEach(group -> {
-                if (group.size() >= 50){
+                if (group.size() >= 50) {
                     return;
                 }
-                
-                group.forEach(blockPos -> {
-                    taskExecutor.add(new GetToBlockTask(blockPos, task -> {}), 1);
-                });
+
+//                group.forEach(blockPos -> {
+//                    GoalBlock goal = new GoalBlock(blockPos);
+//                    new GoalComposite()
+//                    taskExecutor.add(new CustomGoalTask(goal, task -> {}), 1);
+//                });
+                taskExecutor.add(new CustomGoalTask(new GoalComposite(group.stream().map(GoalBlock::new).toArray(GoalBlock[]::new)), task -> {
+                }), 1);
+
             });
 
 
@@ -59,7 +66,7 @@ public class ObsidianCleanTask extends Task {
         Map<BlockPos, Boolean> visited = new HashMap<>();
 
         for (BlockPos pos : posList) {
-            if (visited.getOrDefault(pos, false)){
+            if (visited.getOrDefault(pos, false)) {
                 continue;
             }
 

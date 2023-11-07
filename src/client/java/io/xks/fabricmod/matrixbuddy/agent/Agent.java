@@ -8,7 +8,6 @@ import io.xks.fabricmod.matrixbuddy.agent.tasking.TaskExecutor;
  * Agent
  * attach logger
  * attach commander
- *
  */
 public class Agent {
     Commander commander;
@@ -17,7 +16,8 @@ public class Agent {
     public Agent() {
         this.commander = new Commander();
         this.taskExecutor = new TaskExecutor();
-        taskExecutor.add(new ObsidianCleanTask(task -> {}), 1);
+        taskExecutor.add(new ObsidianCleanTask(task -> {
+        }), 1);
     }
 
 //    public onPlayerDamage()

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class TangibleBlockView implements BlockView{
+public class TangibleBlockView implements BlockView {
     private final BlockPos pos;
     private final BlockState block;
 
@@ -32,12 +32,12 @@ public class TangibleBlockView implements BlockView{
     public List<BlockView> getAdjacent() {
         ArrayList<BlockView> adjacentBlocks = new ArrayList<>(6);
 
-        adjacentBlocks.add(new TangibleBlockView(pos.add(-1,0,0)));
-        adjacentBlocks.add(new TangibleBlockView(pos.add(1,0,0)));
-        adjacentBlocks.add(new TangibleBlockView(pos.add(0,0,1)));
-        adjacentBlocks.add(new TangibleBlockView(pos.add(0,0,-1)));
-        adjacentBlocks.add(new TangibleBlockView(pos.add(0,-1,0)));
-        adjacentBlocks.add(new TangibleBlockView(pos.add(0,1,0)));
+        adjacentBlocks.add(new TangibleBlockView(pos.add(-1, 0, 0)));
+        adjacentBlocks.add(new TangibleBlockView(pos.add(1, 0, 0)));
+        adjacentBlocks.add(new TangibleBlockView(pos.add(0, 0, 1)));
+        adjacentBlocks.add(new TangibleBlockView(pos.add(0, 0, -1)));
+        adjacentBlocks.add(new TangibleBlockView(pos.add(0, -1, 0)));
+        adjacentBlocks.add(new TangibleBlockView(pos.add(0, 1, 0)));
 
         return adjacentBlocks;
     }
