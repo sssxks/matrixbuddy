@@ -1,42 +1,48 @@
-package io.xks.fabricmod.matrixbuddy.agent.b2t2;
+package io.xks.fabricmod.matrixbuddy.agent.movement;
 
+import io.xks.fabricmod.matrixbuddy.MatrixBuddyClient;
 import io.xks.fabricmod.matrixbuddy.agent.tasking.Task;
-import io.xks.fabricmod.matrixbuddy.agent.tasking.TaskExecutor;
 
 import java.util.function.Consumer;
 
-public class SpawnGreener extends Task {
-
-    private final TaskExecutor taskExecutor;
-
+public class ExploreTask extends Task {
+    private final int centerX;
+    private final int centerY;
     /**
      * Constructs a new cooperative task.
      *
      * @param callback a callback to be invoked when the task completes
      */
-    public SpawnGreener(Consumer<Task> callback) {
+    public ExploreTask(int centerX, int centerY, Consumer<Task> callback) {
         super(callback);
-        taskExecutor = new TaskExecutor();
+        this.centerX = centerX;
+        this.centerY = centerY;
     }
 
     @Override
     public void run() {
         super.run();
-//        taskExecutor.add()
+
+        MatrixBuddyClient.INSTANCE.baritone.getExploreProcess().explore(centerX, centerY);
     }
 
     @Override
     public void interrupt() {
         super.interrupt();
+
+        MatrixBuddyClient.INSTANCE.baritone.getPathingBehavior().cancelEverything();
     }
 
     @Override
     public void resume() {
         super.resume();
+
+        run();
     }
 
     @Override
     public void complete() {
+
         super.complete();
     }
 }

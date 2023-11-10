@@ -11,7 +11,6 @@ public abstract class Task {
         NOT_STARTED,
         RUNNING,
         PENDING,
-
         COMPLETED
     }
     public Status status;

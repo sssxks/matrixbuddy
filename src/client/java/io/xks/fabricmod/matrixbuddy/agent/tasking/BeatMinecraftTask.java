@@ -4,6 +4,7 @@ import io.xks.fabricmod.matrixbuddy.agent.collect.MineTask;
 import io.xks.fabricmod.matrixbuddy.agent.crafting.Craft2by2Task;
 import io.xks.fabricmod.matrixbuddy.agent.crafting.CraftPipelineTask;
 import io.xks.fabricmod.matrixbuddy.agent.storage.Recipe;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
@@ -27,11 +28,11 @@ public class BeatMinecraftTask extends Task {
     @Override
     public void run() {
         super.run();
-        new MineTask(16, this::afterChoppingTree, "minecraft:oak_log","minecraft:birch_log","minecraft:spruce_log","minecraft:jungle_log","minecraft:acacia_log","minecraft:dark_oak_log", "minecraft:mangrove_log", "minecraft:cherry_log").run();
+        new MineTask(16, this::afterChoppingTree, Blocks.OAK_LOG, Blocks.BIRCH_LOG, Blocks.SPRUCE_LOG, Blocks.JUNGLE_LOG, Blocks.ACACIA_LOG, Blocks.DARK_OAK_LOG, Blocks.MANGROVE_LOG, Blocks.CHERRY_LOG).run();
     }
 
     public void afterChoppingTree(Task task){
-        new MineTask(16,this::afterCollectingDirt, "minecraft:dirt").run();
+        new MineTask(16,this::afterCollectingDirt, Blocks.DIRT).run();
     }
 
     public void afterCollectingDirt(Task task) {

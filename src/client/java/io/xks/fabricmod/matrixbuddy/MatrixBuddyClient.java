@@ -14,11 +14,11 @@ import net.minecraft.client.MinecraftClient;
  * this class is responsible for initializing the mod. It keeps track of the stage of whether the game has entered the title screen for the first time.
  */
 public class MatrixBuddyClient implements ClientModInitializer {
-    public static MatrixBuddyClient instance;
-    private static boolean hasInitialized = false;
-    private final int decisionPeriodTicks = 10;
+    public static MatrixBuddyClient INSTANCE;
     public IBaritone baritone;
-    private int decisionCooldown;
+    private EventListener listenerInit;
+//    private static boolean hasInitialized = false;
+    private final int decisionPeriodTicks = 10;
     private Agent agent;
 
     private static boolean isInGame(MinecraftClient client) {
@@ -27,20 +27,23 @@ public class MatrixBuddyClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        EventBus.subscribe(TitleScreenEntryEvent.class, this::init);
+        INSTANCE = this;
+        listenerInit = this::init;
+        EventBus.subscribe(TitleScreenEntryEvent.class, listenerInit);
     }
 
     private void init(Event _unused) {
-        if (hasInitialized) {
-            return;
-        }
-        hasInitialized = true;
-//		EventBus.unsubscribe(TitleScreenEntryEvent.class, this::init);
-        instance = this;
+//        if (hasInitialized) {
+//            return;
+//        }
+//        hasInitialized = true;
+		EventBus.unsubscribe(TitleScreenEntryEvent.class, listenerInit);
         this.baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
 
         EventBus.subscribe(ClientTickEvent.class, new EventListener() {
             private boolean firstFire = true;
+            private int decisionCooldown;
+
 
             //			long startTime = 0;
             @Override

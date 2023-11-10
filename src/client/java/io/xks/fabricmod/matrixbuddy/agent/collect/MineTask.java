@@ -3,17 +3,18 @@ package io.xks.fabricmod.matrixbuddy.agent.collect;
 import baritone.api.process.IMineProcess;
 import io.xks.fabricmod.matrixbuddy.MatrixBuddyClient;
 import io.xks.fabricmod.matrixbuddy.agent.tasking.Task;
+import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.function.Consumer;
 
 public class MineTask extends Task {
     private static IMineProcess mineProcess;
-    private final String[] blocks;
     private final int quantity;
+    private final Block[] blocks;
 
 
-    public MineTask(int quantity, Consumer<Task> callback, String... blocks) {
+    public MineTask(int quantity, Consumer<Task> callback, Block... blocks) {
         super(callback);
         this.quantity = quantity;
         this.blocks = blocks;
@@ -30,9 +31,10 @@ public class MineTask extends Task {
     @Override
     public void run() {
         super.run();
-        mineProcess = MatrixBuddyClient.instance.baritone.getMineProcess();
+        mineProcess = MatrixBuddyClient.INSTANCE.baritone.getMineProcess();
 
-        mineProcess.mineByName(quantity, blocks);
+
+        mineProcess.mine(quantity, blocks);
     }
 
     @Override

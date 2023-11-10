@@ -18,10 +18,10 @@ public abstract class MixinTitleScreen extends Screen {
 
     @Inject(at = @At("RETURN"), method = "init")
     private void TitlesScreenEntry(CallbackInfo info) {
+        EventBus.publish(new TitleScreenEntryEvent());
 //        assert this.client != null;
 //        this.client.setScreen(new SelectWorldScreen(this));
 
-        EventBus.publish(new TitleScreenEntryEvent());
 //        List<LevelStorage.LevelSave> list = this.client.getLevelStorage().getLevelList().levels();
 //        list.get(0).
 //        if (this.client.getLevelStorage().levelExists(this.level.getName())) {

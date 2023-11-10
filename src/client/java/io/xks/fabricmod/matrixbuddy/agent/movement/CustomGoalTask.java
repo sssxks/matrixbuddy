@@ -13,7 +13,7 @@ import net.minecraft.client.MinecraftClient;
 import java.util.function.Consumer;
 
 /**
- * task wrapper for baritone CustomGoalProcess, providing lifesaver functionalities including callback after completing the task and pause.
+ * task wrapper for baritone CustomGoalProcess, providing lifesaver functionalities including callback after completing the task and pausing the task.
  */
 public class CustomGoalTask extends Task {
     private Goal goal;
@@ -30,7 +30,7 @@ public class CustomGoalTask extends Task {
     public void run() {
         super.run();
 
-        ICustomGoalProcess customGoalProcess = MatrixBuddyClient.instance.baritone.getCustomGoalProcess();
+        ICustomGoalProcess customGoalProcess = MatrixBuddyClient.INSTANCE.baritone.getCustomGoalProcess();
         customGoalProcess.setGoalAndPath(goal);
 
         EventBus.subscribe(DecisionTickEvent.class, listener);
@@ -39,7 +39,7 @@ public class CustomGoalTask extends Task {
     public void tick(Event event) {
         assert MinecraftClient.getInstance().player != null;
 
-        if (!MatrixBuddyClient.instance.baritone.getCustomGoalProcess().isActive()) {
+        if (!MatrixBuddyClient.INSTANCE.baritone.getCustomGoalProcess().isActive()) {
             complete();
         }
 
@@ -58,7 +58,7 @@ public class CustomGoalTask extends Task {
     @Override
     public void interrupt() {
         super.interrupt();
-        MatrixBuddyClient.instance.baritone.getPathingBehavior().cancelEverything();
+        MatrixBuddyClient.INSTANCE.baritone.getPathingBehavior().cancelEverything();
         EventBus.unsubscribe(DecisionTickEvent.class, listener);
     }
 

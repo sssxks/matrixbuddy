@@ -5,9 +5,11 @@ import baritone.api.pathing.goals.GoalComposite;
 import baritone.cache.WorldScanner;
 import io.xks.fabricmod.matrixbuddy.MatrixBuddyClient;
 import io.xks.fabricmod.matrixbuddy.agent.movement.CustomGoalTask;
+import io.xks.fabricmod.matrixbuddy.agent.movement.ExploreTask;
 import io.xks.fabricmod.matrixbuddy.agent.tasking.Task;
 import io.xks.fabricmod.matrixbuddy.agent.tasking.TaskExecutor;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.*;
@@ -36,21 +38,15 @@ public class ObsidianCleanTask extends Task {
 //            if (status = Status.PENDING) {
 //TODO: task Stack? task state store & resume.
 //            }
-            result.forEach(group -> {
-                if (group.size() >= 50) {
-                    return;
-                }
 
-//                group.forEach(blockPos -> {
-//                    GoalBlock goal = new GoalBlock(blockPos);
-//                    new GoalComposite()
-//                    taskExecutor.add(new CustomGoalTask(goal, task -> {}), 1);
-//                });
-                taskExecutor.add(new CustomGoalTask(new GoalComposite(group.stream().map(GoalBlock::new).toArray(GoalBlock[]::new)), task -> {
-                }), 1);
+            GoalBlock[] goals = result.parallelStream().filter(group -> group.size() < 50).flatMap(group -> group.stream().map(GoalBlock::new)).toArray(GoalBlock[]::new);
 
-            });
-
+            if (goals.length != 0) {
+                taskExecutor.add(new CustomGoalTask(new GoalComposite(goals), task -> run()), 1);
+            } else {
+                assert MinecraftClient.getInstance().player != null;
+                taskExecutor.add(new ExploreTask(MinecraftClient.getInstance().player.getBlockX(), MinecraftClient.getInstance().player.getBlockY(), task -> run()), 1);
+            }
 
         }).exceptionally(ex -> {
 
@@ -58,10 +54,12 @@ public class ObsidianCleanTask extends Task {
         });
     }
 
+
+
     private ArrayList<LinkedList<BlockPos>> calculateObsidianGroup() {
         ArrayList<LinkedList<BlockPos>> groups = new ArrayList<>();
 
-        List<BlockPos> posList = WorldScanner.INSTANCE.scanChunkRadius(MatrixBuddyClient.instance.baritone.getPlayerContext(), List.of(Blocks.OBSIDIAN), 1000, 45, 32);
+        List<BlockPos> posList = WorldScanner.INSTANCE.scanChunkRadius(MatrixBuddyClient.INSTANCE.baritone.getPlayerContext(), List.of(Blocks.OBSIDIAN), 1000, 45, 32);
 
         Map<BlockPos, Boolean> visited = new HashMap<>();
 
@@ -70,12 +68,35 @@ public class ObsidianCleanTask extends Task {
                 continue;
             }
 
-            groups.add(new BlockVisitor().breadthFirstSearch(new TangibleBlockView(pos), visited));
+            groups.add(findGroupOfBlock(new TangibleBlockView(pos), visited));
 
         }
 
 
         return groups;
+    }
+
+    public LinkedList<BlockPos> findGroupOfBlock(BlockView startBlock, Map<BlockPos, Boolean> visited) {
+        assert startBlock.getBlock() == Blocks.OBSIDIAN;
+        LinkedList<BlockPos> group = new LinkedList<>();
+        Queue<BlockView> queue = new LinkedList<>();
+        queue.add(startBlock);
+
+        while (!queue.isEmpty()) {
+            BlockView block = queue.poll();
+            group.add(block.getPos());
+            visited.put(block.getPos(), true);
+
+            for (BlockView neighbor : block.getAdjacent()) {
+                if (neighbor.getBlock() == Blocks.OBSIDIAN
+                        && !visited.getOrDefault(neighbor.getPos(), false)
+                        && !queue.contains(neighbor)) {
+                    queue.add(neighbor);
+                }
+            }
+        }
+
+        return group;
     }
 
     @Override

@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 public class TaskExecutor {
 
     /**
-     * wrapper class used in the task executor.
+     * wrapper class used in the task executor, adding priority and attaches additional callback to signal to the executor.
      */
     private static class PrioritizedTask extends Task{
         @Override

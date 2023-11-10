@@ -208,7 +208,7 @@ public class InventoryController implements Inventory {
                 return InventorySlot.values()[(id - 9) + 9];
             } else if (36 <= id && id <= 39) { //armor
                 return InventorySlot.values()[8 - (id - 36)];
-            } else if (id == 40) {//offhand
+            } else if (id == 40) { //offhand
                 return OFFHAND;
             } else {
                 throw new IllegalArgumentException("clickSlotId should be within the range [0, 40]!");

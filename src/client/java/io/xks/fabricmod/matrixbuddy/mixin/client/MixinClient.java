@@ -25,40 +25,4 @@ public abstract class MixinClient {
         EventBus.publish(new ClientTickEvent(getInstance()));
     }
 
-//    @Inject(method = "setWorld",at = @At("RETURN"))
-//    private void worldEntry(ClientWorld world, CallbackInfo ci){
-//        IBaritone baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
-//
-//        GoalXZ walkingGoal = new GoalXZ(-4000,4000);
-//        ICustomGoalProcess customGoalProcess = baritone.getCustomGoalProcess();
-//        customGoalProcess.setGoalAndPath(walkingGoal);
-
-//        IMineProcess mineProcess = baritone.getMineProcess();
-//        mineProcess.mineByName(32,"minecraft:diamond_ore");
-
-
-//        System.out.println(walkingGoal);
-
-
-//    }
-
-//
-//    @Inject(method = "run",at = @At("HEAD"))
-//    private void startBotTask(CallbackInfo ci){
-//        IBaritone baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
-//
-//        GoalXZ walkingGoal = new GoalXZ(8000,-3000);
-//        ICustomGoalProcess customGoalProcess = baritone.getCustomGoalProcess();
-//        customGoalProcess.setGoalAndPath(walkingGoal);
-//
-//        IMineProcess mineProcess = baritone.getMineProcess();
-//        mineProcess.mineByName(32,"minecraft:diamond_ore");
-//
-//
-//        System.out.println(walkingGoal);
-//
-//
-//    }
-
-
 }
